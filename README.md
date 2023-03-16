@@ -118,6 +118,7 @@ for port in range(22):
     pakiet = IP(dst=cel)/TCP(dport=[port], flags = "S")
     rec, wrong = sr(pakiet, timeout=1, verbose=0)
     print(rec)
+    
     if rec:
         usluga = "{}".format(str(str(rec[0]).split(" ")[7][6:]))
         dane = f"Port: {port} otwarty, usluga = {usluga}"
