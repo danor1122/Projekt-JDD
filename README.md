@@ -116,7 +116,7 @@ cel = target_IP
 pakiet = IP(dst="google.com")/ICMP()/"Projekt"
 for port in range(22):
     pakiet = IP(dst=cel)/TCP(dport=[port], flags = "S")
-    rec, wrong = sr(pakiet, timeout=1, verbose=0) #timeout - dlugosc zycia, verbose - ilosc wyswietlanych inf zwrotnych 0 - 3
+    rec, wrong = sr(pakiet, timeout=1, verbose=0)
     print(rec)
     if rec:
         usluga = "{}".format(str(str(rec[0]).split(" ")[7][6:]))
@@ -124,7 +124,6 @@ for port in range(22):
         print(dane)
     else:
         print(f"{port} Port zablokowany")
-# print(rec)
 
 ################################ 5 - Banner Grabbing ################################
 
@@ -143,16 +142,13 @@ for port in range(1, 65000):
         response = s.recv((2048)).decode()
         print("Name and version service: ", response)
     except:
-#        print(f"[-] {target}: port {port} is CLOSED")
         pass
 
 ################################ 6 - Brute Force ################################
 
 import ftplib
 users = open("usernames.txt", "r")
-# passwords = open("passlist.txt", "r")
-
-passwords = open("testpass.txt", "r") # original password file - passlist.txt
+passwords = open("passlist.txt", "r")
 
 target = target_IP
 for user in users:
