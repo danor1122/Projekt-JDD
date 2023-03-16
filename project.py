@@ -16,6 +16,7 @@ local_ip = get_local_ip()
 print(local_ip)
 
 ##################################### 2 - GET MASK ADDRESS #####################################
+
 from pyroute2 import IPRoute
 ip = IPRoute()
 info = [{'iface': x['index'], 'addr': x.get_attr('IFA_ADDRESS'), 'mask':  x['prefixlen']} for x in ip.get_addr()]
@@ -33,7 +34,7 @@ for index, mask in masks.items():
 
     if index == v:
         index == mask
-        print(mask)
+        print("netmask: ", mask)
         break
 
 ####################################### 3 - Looking for target IP ########################################
