@@ -51,7 +51,7 @@ Załączniki w postaci screenshotów:
 
 # KOD
 
-######################## 1 - GET LOCAL IP ADDRESS ################################
+################################ 1 - GET LOCAL IP ADDRESS ################################
 import socket
 
 def get_local_ip():
@@ -68,7 +68,7 @@ def get_local_ip():
 local_ip = get_local_ip()
 print(local_ip)
 
-##################################### 2 - GET MASK ADDRESS #####################################
+################################ 2 - GET MASK ADDRESS ################################
 
 from pyroute2 import IPRoute
 ip = IPRoute()
@@ -90,7 +90,7 @@ for index, mask in masks.items():
         print("netmask: ", mask)
         break
 
-####################################### 3 - Looking for target IP ########################################
+################################ 3 - Looking for target IP ################################
 
 
 from scapy.all import *
@@ -109,7 +109,7 @@ for i in range(100, 105):
             print("Target IP: ", str(dane.psrc))
             target_IP = dane.psrc
 
-################################## 4 - Ports scaning #####################################
+################################ 4 - Ports scaning ################################
 
 cel = target_IP
 pakiet = IP(dst="google.com")/ICMP()/"Projekt"
@@ -125,7 +125,7 @@ for port in range(22):
         print(f"{port} Port zablokowany")
 # print(rec)
 
-################################## 5 - Banner Grabbing #####################################
+################################ 5 - Banner Grabbing ################################
 
 import socket
 import sys
@@ -145,7 +145,7 @@ for port in range(1, 65000):
 #        print(f"[-] {target}: port {port} is CLOSED")
         pass
 
-############################################ 6 - Brute Force ########################################
+################################ 6 - Brute Force ################################
 
 import ftplib
 users = open("usernames.txt", "r")
