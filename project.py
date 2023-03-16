@@ -96,9 +96,7 @@ for port in range(1, 65000):
 
 import ftplib
 users = open("usernames.txt", "r")
-# passwords = open("passlist.txt", "r")
-
-passwords = open("testpass.txt", "r") # original password file - passlist.txt
+passwords = open("passlist.txt", "r")
 
 target = target_IP
 for user in users:
