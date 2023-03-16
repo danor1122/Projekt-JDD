@@ -52,6 +52,7 @@ Załączniki w postaci screenshotów:
 # KOD
 
 ################################ 1 - GET LOCAL IP ADDRESS ################################
+
 import socket
 
 def get_local_ip():
