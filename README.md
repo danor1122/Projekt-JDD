@@ -52,6 +52,7 @@ Załączniki w postaci screenshotów:
 # KOD
 
 ######################## 1 - GET LOCAL IP ADDRESS ################################
+
 print("1", "\n")
 import socket
 
@@ -70,6 +71,7 @@ local_ip = get_local_ip()
 print("My local IP: ", local_ip)
 
 ##################################### 2 - GET MASK ADDRESS #####################################
+
 print("2", "\n")
 from pyroute2 import IPRoute
 
